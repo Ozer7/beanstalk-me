@@ -23,8 +23,8 @@ const SCENES = {
     spec:
       "Jack is planting the seeds. In the evening, Jack kneels in bare brown dirt in front of a " +
       "small thatched cottage. With one hand he drops a few glowing magic beans into a small hole " +
-      "he has dug in the soil; in his other hand he holds a small garden trowel. No beanstalk, " +
-      "vines or tall plants anywhere — nothing has grown yet.",
+      "he has dug in the soil; in his other hand he holds a small garden trowel. The dirt around " +
+      "him is bare: no beanstalk, vines or sprouts — nothing has grown yet.",
     size: "1024x1024",
   },
   climbing: {
@@ -33,7 +33,7 @@ const SCENES = {
       "Jack is climbing the beanstalk. Jack clings with both hands to a gigantic green beanstalk, " +
       "high up among the clouds. At the top of the picture, the beanstalk reaches " +
       "the clouds, where the giant's castle stands. Far below, at the bottom of the picture, the " +
-      "ground is a patchwork of fields seen from above, with his cottage and village as tiny specks.",
+      "ground is a patchwork of fields seen from above, where his cottage looks tiny.",
     size: "1024x1536", // tall picture: castle above, Jack in the middle, village far below
   },
 };
