@@ -22,17 +22,19 @@ const SCENES = {
     title: "Jack is planting the seeds",
     spec:
       "Jack is planting the seeds. In the evening, Jack kneels in bare brown dirt in front of a " +
-      "small thatched cottage. With one hand he drops three glowing magic beans into a small hole " +
-      "he has dug in the soil. A garden trowel lies in the dirt right next to the hole. No beanstalk, " +
+      "small thatched cottage. With one hand he drops a few glowing magic beans into a small hole " +
+      "he has dug in the soil; in his other hand he holds a small garden trowel. No beanstalk, " +
       "vines or tall plants anywhere — nothing has grown yet.",
+    size: "1024x1024",
   },
   climbing: {
     title: "Jack is climbing the beanstalk",
     spec:
       "Jack is climbing the beanstalk. Jack clings with both hands to a gigantic green beanstalk, " +
-      "high up in the sky. The ground is far below him: his cottage and village look tiny at the " +
-      "bottom of the picture. Above him, the beanstalk disappears into the clouds, where the " +
-      "giant's castle can be seen.",
+      "high in the sky. At the top of the picture, the beanstalk reaches the clouds, where the " +
+      "giant's castle stands. At the bottom of the picture, far below Jack, his cottage and " +
+      "village look tiny.",
+    size: "1024x1536", // tall picture: castle above, Jack in the middle, village far below
   },
 };
 
@@ -136,7 +138,7 @@ app.post("/api/generate", upload.single("photo"), async (req, res) => {
       model: MODEL,
       image,
       prompt: buildPrompt(scene, settings),
-      size: "1024x1024",
+      size: scene.size,
       quality,
     });
 
