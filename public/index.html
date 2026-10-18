@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Beanstalk Me</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #f7f1e3;
+    --card: #fffaf0;
+    --ink: #2d2a24;
+    --muted: #6f6758;
+    --leaf: #3f7d3a;
+    --leaf-dark: #2c5c28;
+    --bean: #c8932e;
+    --line: #e2d6bd;
+    --danger: #a8402f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Nunito", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    background-image: radial-gradient(circle at 10% 0%, #e6f0d8 0, transparent 40%),
+                      radial-gradient(circle at 90% 10%, #f3e3c2 0, transparent 35%);
+    min-height: 100vh;
+  }
+  header { text-align: center; padding: 40px 16px 8px; }
+  h1 {
+    font-family: "Fraunces", serif; font-weight: 800;
+    font-size: clamp(2rem, 6vw, 3.4rem); margin: 0; color: var(--leaf-dark);
+    letter-spacing: -0.02em;
+  }
+  h1 span { color: var(--bean); }
+  header p { color: var(--muted); margin: 8px auto 0; max-width: 560px; }
+
+  main { max-width: 1060px; margin: 0 auto; padding: 24px 16px 64px; }
+  .panel {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px; box-shadow: 0 2px 0 var(--line);
+  }
+  .setup { display: grid; grid-template-columns: 260px 1fr; gap: 24px; }
+  @media (max-width: 760px) { .setup { grid-template-columns: 1fr; } }
+
+  h2 { font-family: "Fraunces", serif; font-size: 1.25rem; margin: 0 0 12px; }
+  .step { display: inline-block; width: 26px; height: 26px; border-radius: 50%;
+          background: var(--leaf); color: #fff; text-align: center; line-height: 26px;
+          font-size: .85rem; margin-right: 8px; }
+
+  .drop {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    aspect-ratio: 1; border: 2px dashed var(--line); border-radius: 14px; cursor: pointer;
+    color: var(--muted); text-align: center; padding: 12px; overflow: hidden; position: relative;
+    background: #fff;
+  }
+  .drop:hover { border-color: var(--leaf); }
+  .drop img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .drop input { display: none; }
+
+  .settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+  label { font-weight: 700; font-size: .9rem; display: block; margin-bottom: 6px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg input { display: none; }
+  .seg label {
+    font-weight: 600; margin: 0; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: #fff; font-size: .85rem;
+  }
+  .seg input:checked + label { background: var(--leaf); color: #fff; border-color: var(--leaf); }
+  .hint { color: var(--muted); font-size: .8rem; margin-top: 4px; }
+
+  .scenes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+  @media (max-width: 760px) { .scenes { grid-template-columns: 1fr; } }
+  .scene h3 { font-family: "Fraunces", serif; margin: 0 0 12px; font-size: 1.15rem; }
+  .frame {
+    aspect-ratio: 1; border-radius: 14px; background: #efe6d2; display: flex;
+    align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--line);
+    color: var(--muted); text-align: center; padding: 12px;
+  }
+  .frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  figure { margin: 0; }
+  figcaption {
+    margin-top: 12px; font-size: .9rem; line-height: 1.45; padding: 12px 14px;
+    background: #fff; border-left: 4px solid var(--bean); border-radius: 8px;
+  }
+  figcaption b { display: block; font-size: .75rem; text-transform: uppercase;
+                 letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+  button {
+    margin-top: 14px; width: 100%; padding: 12px 16px; font: inherit; font-weight: 700;
+    border: 0; border-radius: 12px; background: var(--leaf); color: #fff; cursor: pointer;
+  }
+  button:hover:not(:disabled) { background: var(--leaf-dark); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .error { color: var(--danger); font-size: .9rem; margin-top: 8px; }
+  .spinner {
+    width: 40px; height: 40px; border: 4px solid var(--line); border-top-color: var(--leaf);
+    border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .meta { font-size: .75rem; color: var(--muted); margin-top: 6px; }
+  .dl { display: inline-block; margin-top: 6px; font-size: .85rem; color: var(--leaf-dark); }
+  footer { text-align: center; color: var(--muted); font-size: .8rem; padding-bottom: 32px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Beanstalk <span>Me</span></h1>
+  <p>Upload a photo, pick your cartoon style, and become Jack in two scenes from <em>Jack and the Beanstalk</em>.</p>
+</header>
+
+<main>
+  <section class="panel setup">
+    <div>
+      <h2><span class="step">1</span>Your photo</h2>
+      <label class="drop" id="drop">
+        <input type="file" id="photo" accept="image/png,image/jpeg,image/webp" />
+        <span id="dropText">Click to upload a photo<br><small>Clear, front-facing face works best</small></span>
+        <img id="preview" alt="" hidden />
+      </label>
+    </div>
+
+    <div>
+      <h2><span class="step">2</span>Cartoon settings</h2>
+      <form class="settings" id="settings">
+        <div>
+          <label>Style</label>
+          <div class="seg">
+            <input type="radio" name="style" id="st1" value="storybook" checked><label for="st1">Storybook</label>
+            <input type="radio" name="style" id="st2" value="3d"><label for="st2">3D movie</label>
+            <input type="radio" name="style" id="st3" value="comic"><label for="st3">Comic</label>
+            <input type="radio" name="style" id="st4" value="anime"><label for="st4">Anime</label>
+            <input type="radio" name="style" id="st5" value="flat"><label for="st5">Flat vector</label>
+          </div>
+        </div>
+        <div>
+          <label>Color palette</label>
+          <div class="seg">
+            <input type="radio" name="palette" id="p1" value="vibrant" checked><label for="p1">Vibrant</label>
+            <input type="radio" name="palette" id="p2" value="pastel"><label for="p2">Pastel</label>
+            <input type="radio" name="palette" id="p3" value="earthy"><label for="p3">Earthy</label>
+            <input type="radio" name="palette" id="p4" value="night"><label for="p4">Moonlit</label>
+          </div>
+        </div>
+        <div>
+          <label>Cartoon exaggeration</label>
+          <div class="seg">
+            <input type="radio" name="exaggeration" id="e1" value="low"><label for="e1">Subtle</label>
+            <input type="radio" name="exaggeration" id="e2" value="medium" checked><label for="e2">Medium</label>
+            <input type="radio" name="exaggeration" id="e3" value="high"><label for="e3">Caricature</label>
+          </div>
+        </div>
+        <div>
+          <label>Outlines</label>
+          <div class="seg">
+            <input type="radio" name="outline" id="o1" value="none"><label for="o1">None</label>
+            <input type="radio" name="outline" id="o2" value="thin" checked><label for="o2">Thin</label>
+            <input type="radio" name="outline" id="o3" value="thick"><label for="o3">Bold</label>
+          </div>
+        </div>
+        <div>
+          <label>Image quality</label>
+          <div class="seg">
+            <input type="radio" name="quality" id="q1" value="low" checked><label for="q1">Low</label>
+            <input type="radio" name="quality" id="q2" value="medium"><label for="q2">Medium</label>
+            <input type="radio" name="quality" id="q3" value="high"><label for="q3">High</label>
+          </div>
+          <div class="hint">Higher quality = better likeness, slower, costs more.</div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="scenes">
+    <article class="panel scene" data-scene="planting">
+      <h3><span class="step">3</span>Jack is planting the seeds</h3>
+      <figure>
+        <div class="frame">Upload a photo, then generate this scene.</div>
+        <figcaption><b>Scene specification</b><span class="spec"></span></figcaption>
+      </figure>
+      <div class="error" hidden></div>
+      <button type="button" disabled>Generate scene</button>
+    </article>
+
+    <article class="panel scene" data-scene="climbing">
+      <h3><span class="step">4</span>Jack is climbing the beanstalk</h3>
+      <figure>
+        <div class="frame">Upload a photo, then generate this scene.</div>
+        <figcaption><b>Scene specification</b><span class="spec"></span></figcaption>
+      </figure>
+      <div class="error" hidden></div>
+      <button type="button" disabled>Generate scene</button>
+    </article>
+  </section>
+</main>
+
+<footer>MCON 368 · Your photo is sent to the image model only to make these pictures and is not stored.</footer>
+
+<script>
+  const photoInput = document.getElementById("photo");
+  const preview = document.getElementById("preview");
+  const dropText = document.getElementById("dropText");
+  const cards = document.querySelectorAll(".scene");
+  let photoFile = null;
+
+  // Fill in the scene specs from the server so the captions match exactly what is sent.
+  fetch("/api/scenes").then(r => r.json()).then(scenes => {
+    scenes.forEach(s => {
+      const card = document.querySelector(`.scene[data-scene="${s.id}"]`);
+      if (card) card.querySelector(".spec").textContent = s.spec;
+    });
+  });
+
+  photoInput.addEventListener("change", () => {
+    photoFile = photoInput.files[0] || null;
+    if (!photoFile) return;
+    preview.src = URL.createObjectURL(photoFile);
+    preview.hidden = false;
+    dropText.hidden = true;
+    cards.forEach(c => c.querySelector("button").disabled = false);
+  });
+
+  function currentSettings() {
+    const f = new FormData(document.getElementById("settings"));
+    return Object.fromEntries(f.entries());
+  }
+
+  // Each button makes exactly ONE request for ONE scene.
+  async function generate(card) {
+    const btn = card.querySelector("button");
+    const frame = card.querySelector(".frame");
+    const err = card.querySelector(".error");
+    if (!photoFile) return;
+
+    btn.disabled = true;
+    err.hidden = true;
+    frame.innerHTML = '<div><div class="spinner"></div>Drawing your scene… (this can take 20–60 seconds)</div>';
+
+    const body = new FormData();
+    body.append("photo", photoFile);
+    body.append("scene", card.dataset.scene);
+    Object.entries(currentSettings()).forEach(([k, v]) => body.append(k, v));
+
+    try {
+      const res = await fetch("/api/generate", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong.");
+
+      frame.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = data.image;
+      img.alt = data.caption;
+      frame.appendChild(img);
+      card.querySelector(".spec").textContent = data.caption;
+
+      const old = card.querySelector(".meta"); if (old) old.remove();
+      const oldDl = card.querySelector(".dl"); if (oldDl) oldDl.remove();
+      const s = data.settings;
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = `Style: ${s.style} · Palette: ${s.palette} · Exaggeration: ${s.exaggeration} · Outlines: ${s.outline} · Quality: ${s.quality}`;
+      const dl = document.createElement("a");
+      dl.className = "dl"; dl.href = data.image; dl.download = `jack-${card.dataset.scene}.png`;
+      dl.textContent = "Download image";
+      card.querySelector("figure").append(meta, dl);
+      btn.textContent = "Regenerate scene";
+    } catch (e) {
+      frame.textContent = "No image yet.";
+      err.textContent = e.message;
+      err.hidden = false;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  document.querySelector('.scene[data-scene="planting"] button')
+    .addEventListener("click", e => generate(e.target.closest(".scene")));
+  document.querySelector('.scene[data-scene="climbing"] button')
+    .addEventListener("click", e => generate(e.target.closest(".scene")));
+</script>
+</body>
+</html>
