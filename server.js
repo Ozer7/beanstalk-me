@@ -21,18 +21,18 @@ const SCENES = {
   planting: {
     title: "Jack is planting the seeds",
     spec:
-      "Jack is planting the seeds. Jack kneels in bare brown dirt in front of a small thatched " +
-      "cottage at dusk. With one hand he drops three glowing magic beans into a small hole he has " +
-      "dug in the soil. A garden trowel lies on the ground beside him. No beanstalk, vines or tall " +
-      "plants anywhere — nothing has grown yet.",
+      "Jack is planting the seeds. In the evening, Jack kneels in bare brown dirt in front of a " +
+      "small thatched cottage. With one hand he drops three glowing magic beans into a small hole " +
+      "he has dug in the soil. A garden trowel lies in the dirt right next to the hole. No beanstalk, " +
+      "vines or tall plants anywhere — nothing has grown yet.",
   },
   climbing: {
     title: "Jack is climbing the beanstalk",
     spec:
-      "Jack is climbing the beanstalk. Jack clings with both hands to a gigantic green beanstalk " +
-      "high above the ground, one foot resting on a big leaf. Far below him, his cottage and " +
-      "village look tiny. Above him, the beanstalk disappears into the clouds, where the giant's " +
-      "castle can be seen.",
+      "Jack is climbing the beanstalk. Jack clings with both hands to a gigantic green beanstalk, " +
+      "high up in the sky. The ground is far below him: his cottage and village look tiny at the " +
+      "bottom of the picture. Above him, the beanstalk disappears into the clouds, where the " +
+      "giant's castle can be seen.",
   },
 };
 
@@ -62,7 +62,7 @@ const OUTLINES = {
   thin: "thin, delicate outlines",
   thick: "thick, bold outlines",
 };
-const QUALITIES = new Set(["low", "medium", "high"]);
+const QUALITIES = new Set(["medium", "high"]); // "low" removed: it ignored scene details
 
 function pick(map, key, fallback) {
   return Object.prototype.hasOwnProperty.call(map, key) ? key : fallback;
