@@ -21,18 +21,18 @@ const SCENES = {
   planting: {
     title: "Jack is planting the seeds",
     spec:
-      "Jack is planting the seeds. Outside a small, run-down thatched cottage at dusk, " +
-      "Jack kneels in the bare dirt of the garden and presses the magic beans into a freshly dug " +
-      "hole with his hands. Three or four glowing beans are clearly visible in his open palm and " +
-      "in the soil. A small trowel lies beside him. No beanstalk has grown yet — the ground is flat.",
+      "Jack is planting the seeds. Jack kneels in bare brown dirt in front of a small thatched " +
+      "cottage at dusk. With one hand he drops three glowing magic beans into a small hole he has " +
+      "dug in the soil. A garden trowel lies on the ground beside him. No beanstalk, vines or tall " +
+      "plants anywhere — nothing has grown yet.",
   },
   climbing: {
     title: "Jack is climbing the beanstalk",
     spec:
-      "Jack is climbing the beanstalk. A gigantic green beanstalk with huge leaves twists up " +
-      "into the clouds. Jack is high up on the stalk, gripping it with both hands and one foot " +
-      "braced on a leaf, mid-climb, looking upward. His small cottage and village are tiny far " +
-      "below, and the clouds — with a hint of the giant's castle — are above him.",
+      "Jack is climbing the beanstalk. Jack clings with both hands to a gigantic green beanstalk " +
+      "high above the ground, one foot resting on a big leaf. Far below him, his cottage and " +
+      "village look tiny. Above him, the beanstalk disappears into the clouds, where the giant's " +
+      "castle can be seen.",
   },
 };
 
@@ -82,6 +82,7 @@ function buildPrompt(scene, s) {
     "Dress them in simple peasant clothes appropriate to the fairy tale.",
     "",
     `SCENE (must be shown exactly): ${scene.spec}`,
+    "Every element named in the SCENE must be clearly visible in the picture. Do not add story elements that the SCENE does not mention.",
     "",
     "One single image, full scene, no text, no captions, no speech bubbles, no borders.",
   ].join("\n");
@@ -125,7 +126,7 @@ app.post("/api/generate", upload.single("photo"), async (req, res) => {
       exaggeration: pick(EXAGGERATION, req.body.exaggeration, "medium"),
       outline: pick(OUTLINES, req.body.outline, "thin"),
     };
-    const quality = QUALITIES.has(req.body.quality) ? req.body.quality : "low";
+    const quality = QUALITIES.has(req.body.quality) ? req.body.quality : "medium";
 
     const image = await toFile(req.file.buffer, req.file.originalname || "photo.png", {
       type: req.file.mimetype,
