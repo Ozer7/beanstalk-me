@@ -31,9 +31,9 @@ const SCENES = {
     title: "Jack is climbing the beanstalk",
     spec:
       "Jack is climbing the beanstalk. Jack clings with both hands to a gigantic green beanstalk, " +
-      "high in the sky. At the top of the picture, the beanstalk reaches the clouds, where the " +
-      "giant's castle stands. At the bottom of the picture, far below Jack, his cottage and " +
-      "village look tiny.",
+      "so high up that clouds float below him. At the top of the picture, the beanstalk reaches " +
+      "the clouds, where the giant's castle stands. Far below, at the bottom of the picture, the " +
+      "ground is a patchwork of fields seen from above, with his cottage and village as tiny specks.",
     size: "1024x1536", // tall picture: castle above, Jack in the middle, village far below
   },
 };
