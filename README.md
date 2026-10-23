@@ -2,7 +2,7 @@
 
 A *Jack and the Beanstalk* picture book starring the child in an uploaded photo. This build makes the first three pages and the About Me page, and exports them as one PDF.
 
-Live: https://beanstalk-storybook.onrender.com
+Live: https://storybook.bluebid.online (also https://beanstalk-storybook.onrender.com)
 
 The previous homework, the two-scene version (planting the seeds, climbing the beanstalk), is on the [`two-scenes`](https://github.com/Ozer7/beanstalk-me/tree/two-scenes) branch and still runs at https://beanstalk.bluebid.online.
 
