@@ -1,166 +1,199 @@
 import express from "express";
 import multer from "multer";
-import OpenAI, { toFile } from "openai";
+import { createRequire } from "node:module";
+import path from "node:path";
+import { STYLE, IMAGE_SIZE, PAGES, getPage, enabledPages } from "./lib/storyboard.js";
+import {
+  referencePrompt, referenceEditPrompt, pagePrompt, pageEditPrompt, cleanInstruction,
+} from "./lib/prompts.js";
+import {
+  editImage, normalizePhoto, friendlyError, MODEL, PAGE_QUALITY, REFERENCE_QUALITY, MOCK,
+} from "./lib/images.js";
+import { measureTextZone } from "./lib/look.js";
+import { buildBookPdf, unsupportedChars } from "./lib/pdf.js";
 
-// ---------------------------------------------------------------------------
-// Config — the API key comes ONLY from the environment (set it in Render).
-// ---------------------------------------------------------------------------
+// The API key comes ONLY from the environment (Render → Environment).
 const PORT = process.env.PORT || 3000;
-const MODEL = process.env.IMAGE_MODEL || "gpt-image-1-mini"; // cheap model by default
-
-if (!process.env.OPENAI_API_KEY) {
+if (!process.env.OPENAI_API_KEY && !MOCK) {
   console.warn("WARNING: OPENAI_API_KEY is not set. Image generation will fail.");
 }
-const openai = new OpenAI(); // reads OPENAI_API_KEY from the environment
 
-// ---------------------------------------------------------------------------
-// The two scenes. The `spec` text is sent to the model AND shown as the caption,
-// so the caption is exactly what was asked for.
-// ---------------------------------------------------------------------------
-const SCENES = {
-  planting: {
-    title: "Jack is planting the seeds",
-    spec:
-      "Jack is planting the seeds. In the evening, Jack kneels in bare brown dirt in front of a " +
-      "small thatched cottage. With one hand he drops a few glowing magic beans into a small hole " +
-      "he has dug in the soil; in his other hand he holds a small garden trowel. The dirt around " +
-      "him is bare: no beanstalk, vines or sprouts — nothing has grown yet.",
-    size: "1024x1024",
-  },
-  climbing: {
-    title: "Jack is climbing the beanstalk",
-    spec:
-      "Jack is climbing the beanstalk. Jack clings with both hands to a gigantic green beanstalk, " +
-      "high up among the clouds. At the top of the picture, the beanstalk reaches " +
-      "the clouds, where the giant's castle stands. Far below, at the bottom of the picture, the " +
-      "ground is a patchwork of fields seen from above, where his cottage looks tiny.",
-    size: "1024x1536", // tall picture: castle above, Jack in the middle, village far below
-  },
-};
-
-// ---------------------------------------------------------------------------
-// User-adjustable cartoon settings. Only whitelisted values are accepted.
-// ---------------------------------------------------------------------------
-const STYLES = {
-  storybook: "a classic hand-painted children's storybook illustration with soft watercolor textures",
-  "3d": "a polished 3D animated-movie style (soft lighting, rounded forms, expressive eyes)",
-  comic: "a bold comic-book style with inked outlines and flat cel shading",
-  anime: "a clean anime / Japanese animation style",
-  flat: "a flat vector cartoon style with simple shapes and solid colors",
-};
-const PALETTES = {
-  vibrant: "bright, saturated, cheerful colors",
-  pastel: "soft pastel colors",
-  earthy: "warm earthy, muted folk-tale colors",
-  night: "cool moonlit blues and purples with warm highlights",
-};
-const EXAGGERATION = {
-  low: "Keep proportions realistic — only a light cartoon stylization.",
-  medium: "Use moderate cartoon stylization (slightly larger head and eyes) while keeping the face clearly the same person.",
-  high: "Use strong caricature-style exaggeration of the person's most distinctive features, but the face must still be instantly recognizable as the same person.",
-};
-const OUTLINES = {
-  none: "no visible outlines",
-  thin: "thin, delicate outlines",
-  thick: "thick, bold outlines",
-};
-const QUALITIES = new Set(["medium", "high"]); // "low" removed: it ignored scene details
-
-function pick(map, key, fallback) {
-  return Object.prototype.hasOwnProperty.call(map, key) ? key : fallback;
-}
-
-function buildPrompt(scene, s) {
-  return [
-    "Turn the person in the attached photo into a cartoon character and place them in a scene from the fairy tale 'Jack and the Beanstalk'. The person from the photo IS Jack.",
-    "",
-    "IDENTITY (most important): the cartoon must be clearly recognizable as the exact person in the photo. " +
-      "Preserve their face shape, eye shape and eye color, eyebrows, nose, mouth and smile, ears, skin tone, " +
-      "hair color, hairstyle and hair length, facial hair, glasses, freckles or other distinctive marks. " +
-      "Keep their apparent age and gender presentation. Do not replace them with a generic cartoon face. " +
-      "Their face should be clearly visible and turned at least partly toward the viewer.",
-    "",
-    `STYLE: ${STYLES[s.style]}, ${PALETTES[s.palette]}, ${OUTLINES[s.outline]}. ${EXAGGERATION[s.exaggeration]}`,
-    "Dress them in simple peasant clothes appropriate to the fairy tale.",
-    "",
-    `SCENE (must be shown exactly): ${scene.spec}`,
-    "Every element named in the SCENE must be clearly visible in the picture. Do not add story elements that the SCENE does not mention.",
-    "",
-    "One single image, full scene, no text, no captions, no speech bubbles, no borders.",
-  ].join("\n");
-}
-
-// ---------------------------------------------------------------------------
-// App
-// ---------------------------------------------------------------------------
 const app = express();
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
-  fileFilter: (_req, file, cb) => {
-    const ok = ["image/png", "image/jpeg", "image/webp"].includes(file.mimetype);
-    cb(ok ? null : new Error("Please upload a PNG, JPEG or WEBP photo."), ok);
-  },
-});
-
+app.use(express.json({ limit: "40mb" }));
 app.use(express.static("public"));
 
-app.get("/api/scenes", (_req, res) => {
-  res.json(
-    Object.entries(SCENES).map(([id, sc]) => ({ id, title: sc.title, spec: sc.spec }))
-  );
+// The book font, served to the browser so the page previews match the PDF.
+const require = createRequire(import.meta.url);
+const fontDir = path.dirname(require.resolve("@fontsource/fredoka/files/fredoka-latin-600-normal.woff2"));
+app.use("/fonts", express.static(fontDir, { maxAge: "30d" }));
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const ok = ["image/png", "image/jpeg", "image/webp"].includes(file.mimetype);
+    cb(ok ? null : httpError(400, "Please upload a PNG, JPEG or WEBP photo."), ok);
+  },
 });
 
 app.get("/healthz", (_req, res) => res.send("ok"));
 
-// ONE scene per request — exactly one API call, no loops.
-app.post("/api/generate", upload.single("photo"), async (req, res) => {
+app.get("/api/storyboard", (_req, res) => {
+  res.json({
+    style: STYLE,
+    size: IMAGE_SIZE,
+    model: MODEL,
+    mock: MOCK,
+    pages: PAGES.map(({ id, title, text, enabled, textZone, textSpace, editOf }) => ({
+      id, title, text, enabled, textZone, textSpace, editOf: editOf ?? null,
+    })),
+  });
+});
+
+// Every route below makes exactly ONE image call. The browser asks for the
+// pages one at a time, in order. Nothing retries automatically.
+
+// Photo -> Jack. This picture is the reference for every page of the book.
+app.post("/api/reference", upload.single("photo"), route(async (req) => {
+  if (!req.file) throw httpError(400, "No photo uploaded.");
+  const photo = await normalizePhoto(req.file.buffer);
+  const prompt = referencePrompt();
+  const image = await timed("reference", () =>
+    editImage({ images: [photo], prompt, quality: REFERENCE_QUALITY, mock: "reference" }));
+  return { image: dataUrl(image), photo: dataUrl(photo), prompt, model: MODEL };
+}));
+
+// Fix one thing on the reference (image 1 = reference, image 2 = the photo).
+app.post("/api/reference/edit", route(async (req) => {
+  const reference = imageField(req.body.reference, "reference");
+  const photo = req.body.photo ? imageField(req.body.photo, "photo") : null;
+  const instruction = requireInstruction(req.body.instruction);
+  const prompt = referenceEditPrompt(instruction);
+  const image = await timed("reference edit", () =>
+    editImage({ images: photo ? [reference, photo] : [reference], prompt, quality: REFERENCE_QUALITY, mock: "reference" }));
+  return { image: dataUrl(image), prompt, model: MODEL };
+}));
+
+// Make one page. Image 1 = the Jack reference — the same image for every page.
+// (A page with `editOf` starts from that earlier page instead; see storyboard.)
+app.post("/api/page", route(async (req) => {
+  const spec = requirePage(req.body.pageId);
+  const reference = imageField(req.body.reference, "reference");
+  const images = [reference];
+  if (spec.editOf) images.unshift(imageField(req.body.source, `page ${spec.editOf}`));
+  const prompt = pagePrompt(spec);
+  const image = await timed(`page ${spec.id}`, () => editImage({ images, prompt, mock: spec.id }));
+  return { image: dataUrl(image), prompt, look: await measureTextZone(image, spec.textZone), model: MODEL };
+}));
+
+// Fix one thing on a page: same picture, one change (image 1 = page, image 2 = reference).
+app.post("/api/page/edit", route(async (req) => {
+  const spec = requirePage(req.body.pageId);
+  const pageImage = imageField(req.body.image, `page ${spec.id}`);
+  const reference = imageField(req.body.reference, "reference");
+  const instruction = requireInstruction(req.body.instruction);
+  const prompt = pageEditPrompt(spec, instruction);
+  const image = await timed(`page ${spec.id} edit`, () =>
+    editImage({ images: [pageImage, reference], prompt, mock: spec.id }));
+  return { image: dataUrl(image), prompt, look: await measureTextZone(image, spec.textZone), model: MODEL };
+}));
+
+// Build the PDF: the pages in order, then About Me.
+app.post("/api/book", async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: "No photo uploaded." });
-
-    const sceneId = req.body.scene;
-    const scene = SCENES[sceneId];
-    if (!scene) return res.status(400).json({ error: "Unknown scene." });
-
-    const settings = {
-      style: pick(STYLES, req.body.style, "storybook"),
-      palette: pick(PALETTES, req.body.palette, "vibrant"),
-      exaggeration: pick(EXAGGERATION, req.body.exaggeration, "medium"),
-      outline: pick(OUTLINES, req.body.outline, "thin"),
-    };
-    const quality = QUALITIES.has(req.body.quality) ? req.body.quality : "medium";
-
-    const image = await toFile(req.file.buffer, req.file.originalname || "photo.png", {
-      type: req.file.mimetype,
+    const child = cleanChild(req.body.child);
+    const reference = imageField(req.body.reference, "reference");
+    const given = new Map((req.body.pages || []).map((p) => [Number(p.id), p.image]));
+    const pages = enabledPages().map((spec) => {
+      if (!given.get(spec.id)) throw httpError(400, `Page ${spec.id} isn't made yet.`);
+      return { spec, image: imageField(given.get(spec.id), `page ${spec.id}`) };
     });
-
-    const result = await openai.images.edit({
-      model: MODEL,
-      image,
-      prompt: buildPrompt(scene, settings),
-      size: scene.size,
-      quality,
-    });
-
-    const b64 = result.data?.[0]?.b64_json;
-    if (!b64) throw new Error("The model returned no image.");
-
-    res.json({
-      image: `data:image/png;base64,${b64}`,
-      caption: scene.spec, // caption = the scene specification that was sent
-      title: scene.title,
-      settings: { ...settings, quality, model: MODEL },
-    });
+    const pdf = await buildBookPdf({ pages, reference, child });
+    const slug = child.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "book";
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="jack-and-the-beanstalk-${slug}.pdf"`);
+    res.send(pdf);
   } catch (err) {
-    console.error(err);
-    const status = err.status && err.status < 500 ? err.status : 500;
-    res.status(status).json({ error: err.message || "Generation failed." });
+    sendError(res, err);
   }
 });
 
-// Multer / other errors
-app.use((err, _req, res, _next) => {
-  res.status(400).json({ error: err.message || "Bad request." });
-});
+// Multer and other errors
+app.use((err, _req, res, _next) => sendError(res, err));
 
-app.listen(PORT, () => console.log(`Beanstalk Me running on port ${PORT} (model: ${MODEL})`));
+app.listen(PORT, () =>
+  console.log(`Beanstalk Me on port ${PORT} · model ${MODEL} · pages ${PAGE_QUALITY} · reference ${REFERENCE_QUALITY}${MOCK ? " · MOCK IMAGES" : ""}`)
+);
+
+// ---------------------------------------------------------------------------
+// helpers
+// ---------------------------------------------------------------------------
+function route(fn) {
+  return async (req, res) => {
+    try {
+      res.json(await fn(req));
+    } catch (err) {
+      sendError(res, err);
+    }
+  };
+}
+
+function sendError(res, err) {
+  if (err.expose) return res.status(err.status).json({ error: err.message });
+  if (err instanceof multer.MulterError) return res.status(400).json({ error: err.message });
+  console.error(err);
+  const [status, message] = friendlyError(err);
+  res.status(status).json({ error: message });
+}
+
+function httpError(status, message) {
+  return Object.assign(new Error(message), { status, expose: true });
+}
+
+async function timed(label, fn) {
+  const t = Date.now();
+  const out = await fn();
+  console.log(`${label}: ${((Date.now() - t) / 1000).toFixed(1)}s`);
+  return out;
+}
+
+function requirePage(id) {
+  const spec = getPage(id);
+  if (!spec) throw httpError(400, "Unknown page.");
+  if (!spec.enabled) throw httpError(400, `Page ${spec.id} isn't in this build yet.`);
+  return spec;
+}
+
+function requireInstruction(raw) {
+  const instruction = cleanInstruction(raw);
+  if (instruction.length < 3) throw httpError(400, "Say what to change.");
+  return instruction;
+}
+
+function imageField(value, what) {
+  const m = /^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/s.exec(String(value || ""));
+  if (!m) throw httpError(400, `Missing or invalid ${what} image.`);
+  return Buffer.from(m[2], "base64");
+}
+
+function dataUrl(buf) {
+  const mime = buf[0] === 0x89 && buf[1] === 0x50 ? "image/png" : "image/jpeg";
+  return `data:${mime};base64,${buf.toString("base64")}`;
+}
+
+const CHILD_FIELDS = { name: 40, age: 20, likes: 60, food: 60, growUp: 60, more: 400 };
+
+function cleanChild(raw = {}) {
+  const child = {};
+  for (const [key, max] of Object.entries(CHILD_FIELDS)) {
+    let v = String(raw[key] ?? "").trim();
+    v = key === "more" ? v.replace(/\r/g, "").replace(/\n{3,}/g, "\n\n") : v.replace(/\s+/g, " ");
+    child[key] = v.slice(0, max);
+  }
+  if (!child.name) throw httpError(400, "Type the child's name for the About Me page.");
+  const bad = unsupportedChars(Object.values(child).join(""));
+  if (bad.length) {
+    throw httpError(400, `The book's font can't print ${bad.slice(0, 6).join(" ")} yet. Please use English letters on the About Me page.`);
+  }
+  return child;
+}
