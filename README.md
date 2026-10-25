@@ -9,7 +9,7 @@ The previous homework, the two-scene version (planting the seeds, climbing the b
 ## How it works
 
 1. **Who's the star?** Upload a photo and type the child's name.
-2. **Meet Jack.** One call turns the photo into a full-body Jack in the book's style. You check that it looks like the child (or fix one thing), then approve him. A second call draws his **character sheet**: the same Jack from four angles and with four expressions.
+2. **Meet Jack.** One call turns the photo into a full-body Jack in the book's style. You check that it looks like the child (or fix one thing), then approve him. A second call draws his **character sheet**: the same Jack from four angles and with four expressions. The app shows Jack and lets you flip through the other views with arrows.
 3. **The pages.** Pages 1–3 are drawn at the same time, each from the same two references and the same style line, and shown in the order of the story. After each page, a vision model checks it against that page's checklist (for example, exactly five beans) and the app offers a one-click fix for anything wrong.
 4. **About me.** The name and whatever the uploader types in, with a live preview of the page.
 5. **Read it, then download.** A full-screen reader shows the book exactly as the PDF lays it out, then the PDF downloads.

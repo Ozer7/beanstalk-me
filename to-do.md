@@ -13,13 +13,16 @@ What still needs work in this build (pages 1–3 + About Me).
 - **Switched to `gpt-image-2.5-sunburst` at high quality** after testing it against `gpt-image-2.5-flare` with the same Jack. Sunburst held the face better and followed the scene more closely. Same price per picture, but slower: about 36 seconds per page instead of 23. A whole book (Jack, sheet, three pages) now takes about 2–3 minutes and costs about 25–30¢.
 - **The automatic check uses `gpt-5.4-mini`** and can be wrong too. In testing it called plain grass "not plain", so the "is the words' area clear" question now comes from measuring the pixels instead. A real head or object under the words still gets flagged.
 
+## OpenAI's safety filter
+- **It sometimes blocks a finished picture by mistake.** In my third test, page 3 (the same prompt that had worked three times) was stopped at the output stage. The app now explains that and shows a "Draw again" button, which usually works. OpenAI's looser `moderation: "low"` setting only exists for new images, not for edits like ours, so I can't turn it down.
+
 ## Faces and characters
 - **Only Jack has reference images.** The mother, Milky-White and the old man are kept the same by fixed text descriptions. They matched in my tests, but nothing guarantees it. Next step: a cast sheet like Jack's.
 - **The character sheet adds one more picture per book** (about 30 seconds and 5¢). Worth it for likeness, but it's the slowest part before the pages start.
 
 ## Words on the page
 - **The quiet area for the words isn't guaranteed.** The prompt asks for it and the app warns when something is there, but it doesn't move the words.
-- **The "something is under the words" check is tuned on two books.** Clear sky, floorboards and grass scored at most 0.012; heads and walls 0.045+; the cutoff is 0.03.
+- **The "something is under the words" check is tuned on three books.** Clear sky and grass scored at most 0.017 and strongly grained floorboards 0.034; heads and walls 0.045+. The cutoff is 0.04, which doesn't leave much room either way.
 - **The story always says "Jack" and "his."** It doesn't use the child's own name or pronouns.
 - **About Me only prints English letters.** A Hebrew name is refused instead of printed. Needs the Hebrew font and right-to-left layout.
 

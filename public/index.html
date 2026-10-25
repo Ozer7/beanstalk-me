@@ -99,7 +99,7 @@
     background: var(--paper); box-shadow: inset 0 0 0 2px var(--sky-3); color: var(--ink-2);
   }
   .drop:hover, .drop:focus-within, .drop.dragging { box-shadow: inset 0 0 0 3px var(--leaf); }
-  .drop img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .drop img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
   .drop input { position: absolute; opacity: 0; pointer-events: none; }
   .drop .change { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); background: rgba(27,42,33,.75); color: #fff; padding: 3px 10px; border-radius: 999px; font-size: .85rem; }
   .field { display: grid; gap: 6px; font-weight: 500; }
@@ -140,7 +140,7 @@
   /* ---------- step 2: Jack ---------- */
   .jack { display: grid; grid-template-columns: 110px minmax(220px, 300px) 1fr; gap: 26px; align-items: start; }
   .jack .from { width: 110px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--paper); box-shadow: inset 0 0 0 2px var(--sky-2); }
-  .jack .from img { width: 100%; height: 100%; object-fit: cover; }
+  .jack .from img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
   .jack .side { display: grid; gap: 14px; align-content: start; max-width: 30em; }
   .jack .side h3 { margin: 0; font-size: 1.25rem; font-weight: 600; }
   .jack .side p { margin: 0; }
@@ -150,15 +150,21 @@
   .fix { display: flex; gap: 8px; flex-wrap: wrap; }
   .fix input { flex: 1 1 220px; min-width: 0; padding: 10px 14px; border-radius: 12px; border: 0; background: var(--paper); box-shadow: inset 0 0 0 2px var(--sky-2); }
   .fix input:focus { box-shadow: inset 0 0 0 2px var(--leaf); outline: none; }
-  .sheet { margin: 28px 0 0 136px; max-width: 520px; }
-  .sheet figure { margin: 0; position: relative; aspect-ratio: 3 / 2; border-radius: 4px; overflow: hidden; background: var(--paper); box-shadow: var(--page-shadow); }
-  .sheet figure img { width: 100%; height: 100%; object-fit: cover; }
-  .sheet figcaption { margin-top: 10px; color: var(--ink-2); }
+  /* Jack, plus his other angles one at a time (cells of the character sheet) */
+  .jackview { position: relative; }
+  .sheetcell { position: absolute; inset: 0; background-repeat: no-repeat; background-size: auto 200%; background-color: var(--paper); }
+  .angle-btn {
+    position: absolute; top: calc(50% - 40px); width: 42px; height: 42px; border-radius: 50%; border: 0;
+    background: rgba(255,253,248,.92); color: var(--ink); font-size: 1.6rem; line-height: 1; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(27,42,33,.25); display: grid; place-items: center; padding-bottom: 3px;
+  }
+  .angle-btn:hover { background: #fff; color: var(--leaf-2); }
+  .angle-btn.prev { left: 8px; } .angle-btn.next { right: 8px; }
+  .angle-caption { margin: 10px 0 0; text-align: center; color: var(--ink-2); font-size: .95rem; }
   @media (max-width: 760px) {
     .jack { grid-template-columns: 1fr; }
     .jack .from { width: 84px; }
-    .jack .bookpage { max-width: 300px; }
-    .sheet { margin-left: 0; }
+    .jack .jackview { max-width: 300px; }
   }
 
   /* ---------- step 3: pages ---------- */
@@ -283,7 +289,12 @@
       <p class="lede">Jack is drawn once from the photo, then every page copies him. Make sure he looks right before going on.</p>
       <div class="jack">
         <div class="from"><img id="jackFrom" alt="" hidden /></div>
-        <div class="bookpage" id="jackFrame"><div class="empty">Jack appears here.</div></div>
+        <div class="jackview">
+          <div class="bookpage" id="jackFrame"><div class="empty">Jack appears here.</div></div>
+          <button class="angle-btn prev" id="anglePrev" type="button" aria-label="Previous view of Jack" hidden>‹</button>
+          <button class="angle-btn next" id="angleNext" type="button" aria-label="Next view of Jack" hidden>›</button>
+          <p class="angle-caption" id="angleCaption" aria-live="polite" hidden></p>
+        </div>
         <div class="side">
           <div id="jackStart">
             <button class="btn primary" id="makeJack" type="button" disabled>Draw Jack</button>
@@ -310,16 +321,14 @@
           </div>
           <div id="jackSet" hidden>
             <h3>Jack is set.</h3>
-            <p class="muted" style="margin-top:6px">Every page copies this Jack and the sheet below.</p>
-            <button class="btn small" id="changeJack" type="button" style="margin-top:12px">Change Jack</button>
+            <p class="muted" style="margin-top:6px" id="jackSetNote">Every page copies this Jack. Use the arrows to see him from other angles and with other feelings.</p>
+            <div class="row" style="margin-top:12px">
+              <button class="btn small" id="changeJack" type="button">Change Jack</button>
+              <button class="btn small" id="retrySheet" type="button" hidden>Draw his other angles again</button>
+            </div>
           </div>
           <p class="error" id="jackError" hidden></p>
         </div>
-      </div>
-      <div class="sheet" id="sheetBox" hidden>
-        <figure id="sheetFrame"></figure>
-        <figcaption id="sheetCaption">Jack from every angle and with every feeling, so the pages keep his face.</figcaption>
-        <p class="error" id="sheetError" hidden></p>
       </div>
     </section>
 
@@ -389,6 +398,7 @@
     <div class="bookpage"><div class="empty"></div></div>
     <h3></h3>
     <div class="status"></div>
+    <p class="error" hidden></p>
     <div class="actions">
       <button class="btn small redo" type="button">Draw again</button>
       <button class="btn small fix-toggle" type="button">Fix one thing</button>
@@ -398,7 +408,6 @@
       <input maxlength="300" aria-label="What to change on this page" />
       <button class="btn small" type="submit">Fix it</button>
     </form>
-    <p class="error" hidden></p>
   </article>
 </template>
 
@@ -422,6 +431,10 @@ const blank = () => ({
 let S = blank();
 let BOARD = null;
 const busy = { jack: false, sheet: false, pages: new Set(), book: false };
+// Views of Jack: the reference, then cells of his character sheet (4 x 2 grid;
+// cell 0, the front view, is skipped because the reference already shows it).
+const ANGLES = [[null, "Jack"], [1, "Three-quarter view"], [2, "Side view"], [3, "Three-quarter view, other side"], [4, "Smiling"], [5, "Worried"], [6, "Amazed"], [7, "Shocked"]];
+let angle = 0;
 
 const store = (() => {
   let dbp = null;
@@ -471,6 +484,7 @@ async function setPhoto(file) {
   const photo = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(file); });
   const hadJack = !!S.jack;
   Object.assign(S, { photo, photoNorm: null, jack: null, jackHistory: [], jackApproved: false, sheet: null });
+  angle = 0;
   if (hadJack) S.jackVersion++;
   commit();
 }
@@ -484,7 +498,10 @@ $("#makeJack").addEventListener("click", makeJack);
 $("#retryJack").addEventListener("click", makeJack);
 $("#approveJack").addEventListener("click", approveJack);
 $("#changeJack").addEventListener("click", () => { S.jackApproved = false; commit(); });
-$("#undoJack").addEventListener("click", () => { S.jack = S.jackHistory.pop(); S.jackVersion++; S.sheet = null; commit(); });
+$("#undoJack").addEventListener("click", () => { S.jack = S.jackHistory.pop(); S.jackVersion++; S.sheet = null; angle = 0; commit(); });
+$("#retrySheet").addEventListener("click", async () => { await makeSheet(); if (S.sheet) makePages(BOARD.pages.filter((p) => p.enabled && (!S.pages[p.id] || isStale(p.id))).map((p) => p.id)); });
+$("#anglePrev").addEventListener("click", () => { angle = (angle - 1 + ANGLES.length) % ANGLES.length; drawJackFrame(); });
+$("#angleNext").addEventListener("click", () => { angle = (angle + 1) % ANGLES.length; drawJackFrame(); });
 $("#jackChips").addEventListener("click", (e) => { const b = e.target.closest("[data-fix]"); if (b) fixJack(b.dataset.fix); });
 $("#fixJackForm").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#fixJackInput").value.trim(); if (v) fixJack(v); else $("#fixJackInput").focus(); });
 
@@ -494,6 +511,7 @@ async function makeJack() {
   await work("jack", $("#jackFrame"), "Drawing Jack", "usually about 40 seconds", "#jackError", async () => {
     const d = await api("/api/reference", body, true);
     Object.assign(S, { photoNorm: d.photo, jack: { image: d.image }, jackHistory: [], sheet: null });
+    angle = 0;
     S.jackVersion++;
   });
 }
@@ -503,7 +521,7 @@ async function fixJack(instruction) {
     const d = await api("/api/reference/edit", { reference: S.jack.image, photo: S.photoNorm, instruction });
     S.jackHistory.push(S.jack);
     S.jack = { image: d.image };
-    S.jackVersion++; S.sheet = null;
+    S.jackVersion++; S.sheet = null; angle = 0;
     $("#fixJackInput").value = "";
   });
 }
@@ -515,8 +533,8 @@ async function approveJack() {
 }
 
 async function makeSheet() {
-  $("#sheetBox").hidden = false;
-  await work("sheet", $("#sheetFrame"), "Drawing Jack from every angle", "usually about 30 seconds", "#sheetError", async () => {
+  angle = 0;
+  await work("sheet", $("#jackFrame"), "Drawing Jack from other angles", "usually about 30 seconds", "#jackError", async () => {
     const d = await api("/api/sheet", { reference: S.jack.image, photo: S.photoNorm });
     S.sheet = { image: d.image, jackVersion: S.jackVersion };
   });
@@ -646,7 +664,7 @@ $("#startOver").addEventListener("click", async (e) => {
   }
   clearTimeout(armed); armed = null; e.target.textContent = "Start over";
   await store.clear(); S = blank();
-  $("#name").value = ""; $("#about").reset(); $("#photoInput").value = ""; hideError("#jackError"); hideError("#sheetError"); hideError("#bookError");
+  $("#name").value = ""; $("#about").reset(); $("#photoInput").value = ""; hideError("#jackError"); hideError("#bookError"); angle = 0;
   render(); window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
@@ -704,11 +722,8 @@ function render() {
 
   // 2
   $("#jackFrom").hidden = !S.photo; if (S.photo) $("#jackFrom").src = S.photo;
-  if (!busy.jack) {
-    const f = $("#jackFrame");
-    if (S.jack) { f.innerHTML = ""; const i = new Image(); i.src = S.jack.image; i.alt = "Jack, drawn from the photo"; f.append(i); }
-    else f.innerHTML = '<div class="empty">Jack appears here.</div>';
-  }
+  if (!busy.jack && !busy.sheet) drawJackFrame();
+  else ["#anglePrev", "#angleNext", "#angleCaption"].forEach((s) => ($(s).hidden = true));
   $("#jackStart").hidden = !!S.jack;
   $("#makeJack").disabled = !S.photo || anyBusy;
   $("#jackReview").hidden = !S.jack || S.jackApproved;
@@ -719,11 +734,11 @@ function render() {
   $("#jackChips").querySelectorAll("button").forEach((b) => (b.disabled = anyBusy));
   $("#fixJackForm button").disabled = anyBusy;
   $("#undoJack").hidden = !S.jackHistory.length;
-  $("#sheetBox").hidden = !S.sheet && !busy.sheet && $("#sheetError").hidden;
-  if (!busy.sheet) {
-    const f = $("#sheetFrame");
-    if (S.sheet) { f.innerHTML = ""; const i = new Image(); i.src = S.sheet.image; i.alt = "Jack from four angles and with four expressions"; f.append(i); }
-  }
+  $("#retrySheet").hidden = !(S.jackApproved && !S.sheet && !busy.sheet);
+  $("#retrySheet").disabled = anyBusy;
+  $("#jackSetNote").textContent = S.sheet
+    ? "Every page copies this Jack. Use the arrows to see him from other angles and with other feelings."
+    : "Every page copies this Jack.";
 
   // 3
   const made = enabled.filter((p) => S.pages[p.id]).length;
@@ -781,9 +796,32 @@ function renderPageCard(spec, anyBusy) {
     } else if (st.check) addLine(status, "ok", "✓ Checked: looks right");
     else addLine(status, "muted", "The automatic check didn't run for this page.");
   }
-  $(".actions", card).hidden = !st;
+  // Show "Draw again" after an error too, even before the page exists.
+  $(".actions", card).hidden = !st && $(".error", card).hidden;
+  $(".fix-toggle", card).hidden = !st;
   card.querySelectorAll(".actions button, .fix button").forEach((b) => (b.disabled = anyBusy || !S.jackApproved));
   $(".undo", card).hidden = !st?.history?.length;
+}
+
+function drawJackFrame() {
+  const f = $("#jackFrame");
+  if (!S.sheet && angle) angle = 0;
+  f.innerHTML = "";
+  if (!S.jack) f.innerHTML = '<div class="empty">Jack appears here.</div>';
+  else if (!angle) { const i = new Image(); i.src = S.jack.image; i.alt = "Jack, drawn from the photo"; f.append(i); }
+  else {
+    // Show one cell of the 4 x 2 sheet, filling the page's height.
+    const [cell, label] = ANGLES[angle], col = cell % 4, row = Math.floor(cell / 4);
+    const x = ((col + 0.5) * 1.125 - 0.5) / 3.5;
+    const d = document.createElement("div"); d.className = "sheetcell";
+    d.setAttribute("role", "img"); d.setAttribute("aria-label", `Jack: ${label}`);
+    d.style.backgroundImage = `url("${S.sheet.image}")`;
+    d.style.backgroundPosition = `${(x * 100).toFixed(2)}% ${row * 100}%`;
+    f.append(d);
+  }
+  const show = !!(S.jack && S.sheet);
+  ["#anglePrev", "#angleNext", "#angleCaption"].forEach((s) => ($(s).hidden = !show));
+  if (show) $("#angleCaption").textContent = `${ANGLES[angle][1]} (${angle + 1} of ${ANGLES.length})`;
 }
 
 function addLine(parent, cls, text) { const p = document.createElement("div"); p.className = cls; p.textContent = text; parent.append(p); }
@@ -827,7 +865,6 @@ async function work(key, frame, label, expect, errorEl, fn) {
   const overlay = document.createElement("div"); overlay.className = "working";
   overlay.innerHTML = `<div class="hop"></div><div class="what"></div><small></small>`;
   $(".what", overlay).textContent = `${label}…`;
-  if (key === "sheet" && !frame.querySelector("img")) frame.style.minHeight = "220px";
   frame.append(overlay);
   const t0 = Date.now();
   const tick = () => ($("small", overlay).textContent = `${Math.round((Date.now() - t0) / 1000)} s, ${expect}`);
@@ -835,7 +872,7 @@ async function work(key, frame, label, expect, errorEl, fn) {
   try { await fn(); }
   catch (e) { err.textContent = e.message; err.hidden = false; }
   finally {
-    clearInterval(timer); overlay.remove(); frame.style.minHeight = "";
+    clearInterval(timer); overlay.remove();
     if (id) busy.pages.delete(id); else busy[key] = false;
     commit();
   }
