@@ -44,7 +44,9 @@ Image 1: the Jack reference. Words printed by the PDF afterwards: Jack and his m
 ```text
 Picture-book illustration: Jack and the Beanstalk, page 1 of 20 — "The empty cupboard".
 
-IMAGE 1 is the character reference for Jack. Jack in this picture is exactly that child: same face, eyes, eyebrows, nose, mouth, skin tone, hair colour, hairstyle and hair length, same age and body proportions, same outfit. Only the pose, the expression and the camera angle change. Use image 1 for Jack only — not its plain background or its standing pose.
+IMAGE 1 is the character reference for Jack. Jack in this picture is exactly that person: same face shape, eyes, eyebrows, nose, mouth, ears, skin tone, hair colour, hairstyle and hair length, same glasses and facial hair if he has them, same age and body proportions, same outfit.
+IMAGE 2 is Jack's character sheet: the same Jack from the front, at three-quarter angles and in profile, and with several expressions. When Jack turns his head or shows a feeling on this page, copy how his face looks from that angle and with that feeling in IMAGE 2.
+Use the reference images for Jack only — not their plain backgrounds, layouts or standing poses.
 
 STYLE: Modern 3D animated feature — rounded forms, large expressive eyes, soft rim light.
 
@@ -56,7 +58,8 @@ ALSO IN THIS PICTURE (each looks the same on every page it appears on):
 - the cottage — a small, crooked stone cottage with a mossy thatched roof, a round blue wooden front door and two small square windows
 
 SCENE: inside the cottage — a bare, poor kitchen. A wall cupboard stands wide open and is completely empty. A cold fireplace, a bare wooden table, a single stool. Jack's mother stands on the left beside the empty cupboard, worried. The round front door in the back wall is open, and through it we see Milky-White standing in the sunny yard outside.
-JACK: right of centre, facing the viewer — the full face is visible and lit from the front — with the eyes turned toward the mother on the left. Expression: worried, but brave.
+JACK: right of centre, facing the viewer — the full face is visible and lit from the front — with the eyes turned toward the mother on the left.
+JACK'S EXPRESSION: worried but brave: eyebrows raised and drawn together a little, eyes soft, a small brave closed-mouth smile. Make Jack's expression big and easy to read, like a character in an animated feature, but change only the eyebrows, eyes and mouth: face shape, nose, ears, hair, glasses and facial hair (if any) stay exactly as in the references.
 LIGHT AND COLOUR: soft morning light falls on Jack's face from the front. Warm, muted, earthy colours: worn wood, grey stone, faded cloth.
 SPACE FOR THE WORDS: keep the bottom third of the picture quiet and simple — plain, empty floorboards. No people, faces, hands, important objects or busy detail there. The words of the page are printed over that area later.
 
@@ -70,7 +73,9 @@ Image 1: the Jack reference. Words printed by the PDF afterwards: “Five magic 
 ```text
 Picture-book illustration: Jack and the Beanstalk, page 2 of 20 — "The trade".
 
-IMAGE 1 is the character reference for Jack. Jack in this picture is exactly that child: same face, eyes, eyebrows, nose, mouth, skin tone, hair colour, hairstyle and hair length, same age and body proportions, same outfit. Only the pose, the expression and the camera angle change. Use image 1 for Jack only — not its plain background or its standing pose.
+IMAGE 1 is the character reference for Jack. Jack in this picture is exactly that person: same face shape, eyes, eyebrows, nose, mouth, ears, skin tone, hair colour, hairstyle and hair length, same glasses and facial hair if he has them, same age and body proportions, same outfit.
+IMAGE 2 is Jack's character sheet: the same Jack from the front, at three-quarter angles and in profile, and with several expressions. When Jack turns his head or shows a feeling on this page, copy how his face looks from that angle and with that feeling in IMAGE 2.
+Use the reference images for Jack only — not their plain backgrounds, layouts or standing poses.
 
 STYLE: Modern 3D animated feature — rounded forms, large expressive eyes, soft rim light.
 
@@ -80,8 +85,9 @@ ALSO IN THIS PICTURE (each looks the same on every page it appears on):
 - the old man — small, stooped and cheerful, with a long white beard, a battered pointed green hat, a patched brown cloak and a crooked walking stick
 - Milky-White, the cow — a gentle, bony white cow with a pale pink nose, soft brown eyes, short curved horns and a small brass bell on a rope collar
 
-SCENE: a dirt road through green fields on the way to market, with a small market town far away on the horizon. The old man stands at the side of the road holding out an open palm toward Jack. In the palm lie exactly FIVE shiny beans — not four, not six — spread out in one row so each can be counted: one red, one gold, one green, one blue, one purple. There are no other beans anywhere in the picture. Milky-White stands just behind Jack, on a rope that Jack holds.
-JACK: in three-quarter view, NOT facing the camera: Jack's body and head are turned about 45 degrees toward the old man, so we see more of one side of the face than the other, with both eyes still visible. Jack holds Milky-White's rope in one hand and looks down at the beans in the old man's palm, curious and tempted. Same clothes as on page 1.
+SCENE: a dirt road through green fields on the way to market, with a small market town far away on the horizon. The old man stands at the side of the road and holds his open palm out toward Jack at Jack's chest height, near the middle of the picture. In the palm lie exactly FIVE big, shiny beans, each about the size of a walnut, in one row with a gap between each: one red, one gold, one green, one blue, one purple — five clearly different colours, none touching, none hidden by fingers. There are no other beans anywhere in the picture. Milky-White stands just behind Jack, on a rope that Jack holds.
+JACK: in three-quarter view: Jack's body and head are turned about 45 degrees toward the old man, with both eyes and most of the face still visible. Jack holds Milky-White's rope in one hand and looks at the beans in the old man's palm. Same clothes as on page 1.
+JACK'S EXPRESSION: amazed and delighted: eyebrows up, eyes wide and shining, a big open-mouthed smile. Make Jack's expression big and easy to read, like a character in an animated feature, but change only the eyebrows, eyes and mouth: face shape, nose, ears, hair, glasses and facial hair (if any) stay exactly as in the references.
 LIGHT AND COLOUR: bright, clear late-morning daylight. Fresh greens, warm earth tones and a soft blue sky.
 SPACE FOR THE WORDS: keep the top third of the picture quiet and simple — open sky, calm and pale blue with only a few faint wisps of cloud. Nothing reaches up into it: no birds, trees, rooftops, hills, heads, hats or horns. Frame the characters from a little further back so the tops of all their heads sit well below the top third. No people, faces, hands, important objects or busy detail there. The words of the page are printed over that area later.
 
@@ -95,7 +101,9 @@ Image 1: the Jack reference. Words printed by the PDF afterwards: “Beans!” s
 ```text
 Picture-book illustration: Jack and the Beanstalk, page 3 of 20 — "Out the window".
 
-IMAGE 1 is the character reference for Jack. Jack in this picture is exactly that child: same face, eyes, eyebrows, nose, mouth, skin tone, hair colour, hairstyle and hair length, same age and body proportions, same outfit. Only the pose, the expression and the camera angle change. Use image 1 for Jack only — not its plain background or its standing pose.
+IMAGE 1 is the character reference for Jack. Jack in this picture is exactly that person: same face shape, eyes, eyebrows, nose, mouth, ears, skin tone, hair colour, hairstyle and hair length, same glasses and facial hair if he has them, same age and body proportions, same outfit.
+IMAGE 2 is Jack's character sheet: the same Jack from the front, at three-quarter angles and in profile, and with several expressions. When Jack turns his head or shows a feeling on this page, copy how his face looks from that angle and with that feeling in IMAGE 2.
+Use the reference images for Jack only — not their plain backgrounds, layouts or standing poses.
 
 STYLE: Modern 3D animated feature — rounded forms, large expressive eyes, soft rim light.
 
@@ -105,8 +113,9 @@ ALSO IN THIS PICTURE (each looks the same on every page it appears on):
 - Jack's mother — a slim woman in her thirties with a kind, tired face; her skin tone and hair colour match Jack's; her hair is tucked under a faded blue headscarf; she wears a patched grey-blue dress and a cream apron
 - the cottage — a small, crooked stone cottage with a mossy thatched roof, a round blue wooden front door and two small square windows
 
-SCENE: outside the cottage at dusk. Jack's mother leans out of an open, lit window, flinging a handful of beans away. Exactly five beans — one red, one gold, one green, one blue, one purple — scatter through the air and fall onto a bare patch of garden soil beside the cottage, with open sky above that patch. Jack stands in the open front doorway, watching the beans.
-JACK: standing in the open front doorway, full figure and smaller in the frame. Jack does NOT look at the viewer: his head and eyes are turned toward the beans falling from the window, so we see his face in three-quarter view, lit warmly from inside the cottage. One hand is raised, mouth open. Expression: dismayed.
+SCENE: the front of the cottage at dusk, seen from the garden. Jack's mother leans out of an open, lit window on the right and flings a handful of beans out over the garden. Exactly five beans — one red, one gold, one green, one blue, one purple — fly out away from the cottage in a wide, loose spray, each big enough to see clearly, heading down toward a bare patch of garden soil in the middle of the picture, with open sky above that patch. They do not run down the wall in a line.
+JACK: standing in the open front doorway on the left, large in the frame: from head to boots he fills about half of the picture's height, and his boots sit just above the bottom third. He faces the viewer, with his face lit warmly and evenly from inside the cottage so every feature is clear. Only his eyes look up toward the flying beans. One hand is raised to his cheek.
+JACK'S EXPRESSION: shocked: eyebrows high, eyes wide, mouth open in a round "oh no!". Make Jack's expression big and easy to read, like a character in an animated feature, but change only the eyebrows, eyes and mouth: face shape, nose, ears, hair, glasses and facial hair (if any) stay exactly as in the references.
 LIGHT AND COLOUR: dusk: a deep blue-violet evening sky with the first stars; warm orange light glows from the cottage's door and window. A clearly darker, cooler palette than the daytime pages.
 SPACE FOR THE WORDS: keep the bottom third of the picture quiet and simple — dark, shadowy grass in the front garden, simple and low in contrast. No people, faces, hands, important objects or busy detail there. The words of the page are printed over that area later.
 
@@ -122,7 +131,7 @@ Edit IMAGE 1. It is page 1 of a picture book: Jack and the Beanstalk — "The em
 
 CHANGE ONLY THIS: <one change>
 
-Keep everything else in image 1 exactly as it is: the composition, camera angle, characters, poses, setting, lighting and colours. If the change touches Jack, Jack must still match IMAGE 2, the character reference: same face, eyes, eyebrows, nose, mouth, skin tone, hair colour, hairstyle and hair length, same age and body proportions, same outfit.
+Keep everything else in image 1 exactly as it is: the composition, camera angle, characters, poses, setting, lighting and colours. If the change touches Jack, Jack must still match IMAGE 2 (Jack's reference) and IMAGE 3 (his character sheet): same face shape, eyes, eyebrows, nose, mouth, ears, skin tone, hair colour, hairstyle and hair length, same glasses and facial hair if he has them, same age and body proportions, same outfit.
 
 STYLE: Modern 3D animated feature — rounded forms, large expressive eyes, soft rim light.
 
@@ -156,7 +165,9 @@ Picture-book illustration: Jack and the Beanstalk, page 4 of 20 — "The beansta
 
 IMAGE 1 is page 3 of this book ("Out the window"). Make this page by editing it: keep the same camera position, the same cottage, garden and surroundings. What changes: the next morning at dawn. From the bare patch of soil where the beans fell, a gigantic beanstalk has grown overnight: a thick, twisting green stalk with huge leaves that climbs out of the top of the picture into the clouds.
 
-IMAGE 2 is the character reference for Jack. Jack must match it: same face, eyes, eyebrows, nose, mouth, skin tone, hair colour, hairstyle and hair length, same age and body proportions, same outfit.
+IMAGE 2 is the character reference for Jack. Jack in this picture is exactly that person: same face shape, eyes, eyebrows, nose, mouth, ears, skin tone, hair colour, hairstyle and hair length, same glasses and facial hair if he has them, same age and body proportions, same outfit.
+IMAGE 3 is Jack's character sheet: the same Jack from the front, at three-quarter angles and in profile, and with several expressions. When Jack turns his head or shows a feeling on this page, copy how his face looks from that angle and with that feeling in IMAGE 3.
+Use the reference images for Jack only — not their plain backgrounds, layouts or standing poses.
 
 STYLE: Modern 3D animated feature — rounded forms, large expressive eyes, soft rim light.
 
@@ -165,7 +176,8 @@ JACK'S OUTFIT, the same on every page: a loose cream linen shirt with the sleeve
 ALSO IN THIS PICTURE (each looks the same on every page it appears on):
 - the cottage — a small, crooked stone cottage with a mossy thatched roof, a round blue wooden front door and two small square windows
 
-JACK: standing in the doorway in the same place as before, looking up at the beanstalk in amazement.
+JACK: standing in the doorway in the same place as before, looking up at the beanstalk.
+JACK'S EXPRESSION: astonished: eyebrows high, eyes wide, mouth open in a huge smile. Make Jack's expression big and easy to read, like a character in an animated feature, but change only the eyebrows, eyes and mouth: face shape, nose, ears, hair, glasses and facial hair (if any) stay exactly as in the references.
 LIGHT AND COLOUR: dawn: a pale gold and pink sky, soft cool morning light.
 SPACE FOR THE WORDS: keep the bottom quarter of the picture quiet and simple — dewy grass in the front garden, simple and low in contrast. No people, faces, hands, important objects or busy detail there. The words of the page are printed over that area later.
 

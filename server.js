@@ -2,14 +2,16 @@ import express from "express";
 import multer from "multer";
 import { createRequire } from "node:module";
 import path from "node:path";
-import { STYLE, IMAGE_SIZE, PAGES, getPage, enabledPages } from "./lib/storyboard.js";
+import { STYLE, IMAGE_SIZE, SHEET_SIZE, PAGES, getPage, enabledPages } from "./lib/storyboard.js";
 import {
-  referencePrompt, referenceEditPrompt, pagePrompt, pageEditPrompt, cleanInstruction,
+  referencePrompt, referenceEditPrompt, sheetPrompt, pagePrompt, pageEditPrompt, cleanInstruction,
 } from "./lib/prompts.js";
 import {
-  editImage, normalizePhoto, friendlyError, MODEL, PAGE_QUALITY, REFERENCE_QUALITY, MOCK,
+  editImage, normalizePhoto, friendlyError, pickModel, pickQuality,
+  MODEL, MODELS, PAGE_QUALITY, REFERENCE_QUALITY, MOCK,
 } from "./lib/images.js";
 import { measureTextZone } from "./lib/look.js";
+import { checkPage, CHECK_MODEL } from "./lib/check.js";
 import { buildBookPdf, unsupportedChars } from "./lib/pdf.js";
 
 // The API key comes ONLY from the environment (Render → Environment).
@@ -43,6 +45,9 @@ app.get("/api/storyboard", (_req, res) => {
     style: STYLE,
     size: IMAGE_SIZE,
     model: MODEL,
+    models: MODELS,
+    quality: PAGE_QUALITY,
+    checkModel: CHECK_MODEL,
     mock: MOCK,
     pages: PAGES.map(({ id, title, text, enabled, textZone, textSpace, editOf }) => ({
       id, title, text, enabled, textZone, textSpace, editOf: editOf ?? null,
@@ -50,52 +55,74 @@ app.get("/api/storyboard", (_req, res) => {
   });
 });
 
-// Every route below makes exactly ONE image call. The browser asks for the
-// pages one at a time, in order. Nothing retries automatically.
+// Every route below makes exactly ONE image call (pages also get one check
+// call afterwards). The browser asks for the pages one at a time, in order.
+// Nothing retries automatically.
 
 // Photo -> Jack. This picture is the reference for every page of the book.
 app.post("/api/reference", upload.single("photo"), route(async (req) => {
   if (!req.file) throw httpError(400, "No photo uploaded.");
+  const model = pickModel(req.body.model);
   const photo = await normalizePhoto(req.file.buffer);
   const prompt = referencePrompt();
   const image = await timed("reference", () =>
-    editImage({ images: [photo], prompt, quality: REFERENCE_QUALITY, mock: "reference" }));
-  return { image: dataUrl(image), photo: dataUrl(photo), prompt, model: MODEL };
+    editImage({ images: [photo], prompt, model, quality: REFERENCE_QUALITY, mock: "reference" }));
+  return { image: dataUrl(image), photo: dataUrl(photo), prompt, model };
 }));
 
 // Fix one thing on the reference (image 1 = reference, image 2 = the photo).
 app.post("/api/reference/edit", route(async (req) => {
+  const model = pickModel(req.body.model);
   const reference = imageField(req.body.reference, "reference");
   const photo = req.body.photo ? imageField(req.body.photo, "photo") : null;
   const instruction = requireInstruction(req.body.instruction);
   const prompt = referenceEditPrompt(instruction);
   const image = await timed("reference edit", () =>
-    editImage({ images: photo ? [reference, photo] : [reference], prompt, quality: REFERENCE_QUALITY, mock: "reference" }));
-  return { image: dataUrl(image), prompt, model: MODEL };
+    editImage({ images: photo ? [reference, photo] : [reference], prompt, model, quality: REFERENCE_QUALITY, mock: "reference" }));
+  return { image: dataUrl(image), prompt, model };
 }));
 
-// Make one page. Image 1 = the Jack reference — the same image for every page.
-// (A page with `editOf` starts from that earlier page instead; see storyboard.)
+// Jack's character sheet: the approved Jack from several angles and with
+// several expressions (image 1 = reference, image 2 = the photo). It goes
+// with the reference into every page call.
+app.post("/api/sheet", route(async (req) => {
+  const model = pickModel(req.body.model);
+  const reference = imageField(req.body.reference, "reference");
+  const photo = req.body.photo ? imageField(req.body.photo, "photo") : null;
+  const prompt = sheetPrompt();
+  const image = await timed("sheet", () =>
+    editImage({ images: photo ? [reference, photo] : [reference], prompt, model, quality: REFERENCE_QUALITY, size: SHEET_SIZE, mock: "sheet" }));
+  return { image: dataUrl(image), prompt, model };
+}));
+
+// Make one page from the same references every time: image 1 = Jack,
+// image 2 = his character sheet. (A page with `editOf` starts from that
+// earlier page instead; see storyboard.) Then check it.
 app.post("/api/page", route(async (req) => {
   const spec = requirePage(req.body.pageId);
-  const reference = imageField(req.body.reference, "reference");
-  const images = [reference];
+  const model = pickModel(req.body.model);
+  const quality = pickQuality(req.body.quality, PAGE_QUALITY);
+  const images = references(req.body);
   if (spec.editOf) images.unshift(imageField(req.body.source, `page ${spec.editOf}`));
-  const prompt = pagePrompt(spec);
-  const image = await timed(`page ${spec.id}`, () => editImage({ images, prompt, mock: spec.id }));
-  return { image: dataUrl(image), prompt, look: await measureTextZone(image, spec), model: MODEL };
+  const prompt = pagePrompt(spec, { sheet: images.length > (spec.editOf ? 2 : 1) });
+  const image = await timed(`page ${spec.id} (${model}, ${quality})`, () =>
+    editImage({ images, prompt, model, quality, mock: spec.id }));
+  return finishPage(image, spec, { prompt, model, quality });
 }));
 
-// Fix one thing on a page: same picture, one change (image 1 = page, image 2 = reference).
+// Fix one thing on a page: same picture, one change
+// (image 1 = page, image 2 = Jack, image 3 = his character sheet). Then check it.
 app.post("/api/page/edit", route(async (req) => {
   const spec = requirePage(req.body.pageId);
+  const model = pickModel(req.body.model);
+  const quality = pickQuality(req.body.quality, PAGE_QUALITY);
   const pageImage = imageField(req.body.image, `page ${spec.id}`);
-  const reference = imageField(req.body.reference, "reference");
+  const refs = references(req.body);
   const instruction = requireInstruction(req.body.instruction);
-  const prompt = pageEditPrompt(spec, instruction);
-  const image = await timed(`page ${spec.id} edit`, () =>
-    editImage({ images: [pageImage, reference], prompt, mock: spec.id }));
-  return { image: dataUrl(image), prompt, look: await measureTextZone(image, spec), model: MODEL };
+  const prompt = pageEditPrompt(spec, instruction, { sheet: refs.length > 1 });
+  const image = await timed(`page ${spec.id} edit (${model}, ${quality})`, () =>
+    editImage({ images: [pageImage, ...refs], prompt, model, quality, mock: spec.id }));
+  return finishPage(image, spec, { prompt, model, quality, instruction });
 }));
 
 // Build the PDF: the pages in order, then About Me.
@@ -128,6 +155,20 @@ app.listen(PORT, () =>
 // ---------------------------------------------------------------------------
 // helpers
 // ---------------------------------------------------------------------------
+function references(body) {
+  const refs = [imageField(body.reference, "reference")];
+  if (body.sheet) refs.push(imageField(body.sheet, "character sheet"));
+  return refs;
+}
+
+async function finishPage(image, spec, info) {
+  const [look, check] = await Promise.all([
+    measureTextZone(image, spec),
+    timed(`page ${spec.id} check`, () => checkPage(image, spec)),
+  ]);
+  return { image: dataUrl(image), look, check, ...info };
+}
+
 function route(fn) {
   return async (req, res) => {
     try {
