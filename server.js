@@ -108,7 +108,9 @@ app.post("/api/sheet", route(async (req) => {
 // The sheet's separate views (for books whose sheet was made before the app
 // cut them out). No OpenAI call.
 app.post("/api/sheet/views", route(async (req) => {
-  return { views: await otherViews(imageField(req.body.sheet, "character sheet")) };
+  const sheet = imageField(req.body.sheet, "character sheet");
+  if (req.query.debug) { const d = {}; await sheetViews(sheet, d); return d; }
+  return { views: await otherViews(sheet) };
 }));
 
 // Make one page from the same references every time: image 1 = Jack,
