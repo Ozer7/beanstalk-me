@@ -12,6 +12,7 @@ import {
 } from "./lib/images.js";
 import { measureTextZone } from "./lib/look.js";
 import { checkPage, CHECK_MODEL } from "./lib/check.js";
+import { sheetViews } from "./lib/sheet.js";
 import { buildBookPdf, unsupportedChars } from "./lib/pdf.js";
 import { layoutWords, PAGE_W } from "./lib/layout.js";
 
@@ -101,7 +102,13 @@ app.post("/api/sheet", route(async (req) => {
   const prompt = sheetPrompt();
   const image = await timed("sheet", () =>
     editImage({ images: photo ? [reference, photo] : [reference], prompt, model, quality: REFERENCE_QUALITY, size: SHEET_SIZE, mock: "sheet" }));
-  return { image: dataUrl(image), prompt, model };
+  return { image: dataUrl(image), views: await otherViews(image), prompt, model };
+}));
+
+// The sheet's separate views (for books whose sheet was made before the app
+// cut them out). No OpenAI call.
+app.post("/api/sheet/views", route(async (req) => {
+  return { views: await otherViews(imageField(req.body.sheet, "character sheet")) };
 }));
 
 // Make one page from the same references every time: image 1 = Jack,
@@ -164,6 +171,11 @@ app.listen(PORT, () =>
 // ---------------------------------------------------------------------------
 // helpers
 // ---------------------------------------------------------------------------
+// Every view on the sheet except the front one, which the reference already shows.
+async function otherViews(sheet) {
+  return (await sheetViews(sheet)).filter((v) => v.row || v.col).map(({ label, image }) => ({ label, image }));
+}
+
 function wordsPreview(spec) {
   const { size, lines, box } = layoutWords(spec);
   return { size: size / PAGE_W, lines: lines.map((l) => l.text), box };

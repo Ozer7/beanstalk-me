@@ -152,7 +152,7 @@
   .fix input:focus { box-shadow: inset 0 0 0 2px var(--leaf); outline: none; }
   /* Jack, plus his other angles one at a time (cells of the character sheet) */
   .jackview { position: relative; }
-  .sheetcell { position: absolute; inset: 0; background-repeat: no-repeat; background-size: auto 200%; background-color: var(--paper); }
+  .bookpage img.view { object-fit: contain; background: #faf3e6; padding: 6%; }
   .angle-btn {
     position: absolute; top: calc(50% - 40px); width: 42px; height: 42px; border-radius: 50%; border: 0;
     background: rgba(255,253,248,.92); color: var(--ink); font-size: 1.6rem; line-height: 1; cursor: pointer;
@@ -431,10 +431,11 @@ const blank = () => ({
 let S = blank();
 let BOARD = null;
 const busy = { jack: false, sheet: false, pages: new Set(), book: false };
-// Views of Jack: the reference, then cells of his character sheet (4 x 2 grid;
-// cell 0, the front view, is skipped because the reference already shows it).
-const ANGLES = [[null, "Jack"], [1, "Three-quarter view"], [2, "Side view"], [3, "Three-quarter view, other side"], [4, "Smiling"], [5, "Worried"], [6, "Amazed"], [7, "Shocked"]];
+// Views of Jack: the reference, then the other views cut from his character
+// sheet by the server (lib/sheet.js).
 let angle = 0;
+let fetchingViews = false;
+const views = () => [{ label: "Jack", image: S.jack && S.jack.image }, ...((S.sheet && S.sheet.views) || [])];
 
 const store = (() => {
   let dbp = null;
@@ -500,8 +501,8 @@ $("#approveJack").addEventListener("click", approveJack);
 $("#changeJack").addEventListener("click", () => { S.jackApproved = false; commit(); });
 $("#undoJack").addEventListener("click", () => { S.jack = S.jackHistory.pop(); S.jackVersion++; S.sheet = null; angle = 0; commit(); });
 $("#retrySheet").addEventListener("click", async () => { await makeSheet(); if (S.sheet) makePages(BOARD.pages.filter((p) => p.enabled && (!S.pages[p.id] || isStale(p.id))).map((p) => p.id)); });
-$("#anglePrev").addEventListener("click", () => { angle = (angle - 1 + ANGLES.length) % ANGLES.length; drawJackFrame(); });
-$("#angleNext").addEventListener("click", () => { angle = (angle + 1) % ANGLES.length; drawJackFrame(); });
+$("#anglePrev").addEventListener("click", () => { const n = views().length; angle = (angle - 1 + n) % n; drawJackFrame(); });
+$("#angleNext").addEventListener("click", () => { angle = (angle + 1) % views().length; drawJackFrame(); });
 $("#jackChips").addEventListener("click", (e) => { const b = e.target.closest("[data-fix]"); if (b) fixJack(b.dataset.fix); });
 $("#fixJackForm").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#fixJackInput").value.trim(); if (v) fixJack(v); else $("#fixJackInput").focus(); });
 
@@ -536,7 +537,7 @@ async function makeSheet() {
   angle = 0;
   await work("sheet", $("#jackFrame"), "Drawing Jack from other angles", "usually about 30 seconds", "#jackError", async () => {
     const d = await api("/api/sheet", { reference: S.jack.image, photo: S.photoNorm });
-    S.sheet = { image: d.image, jackVersion: S.jackVersion };
+    S.sheet = { image: d.image, views: d.views, jackVersion: S.jackVersion };
   });
 }
 
@@ -805,23 +806,26 @@ function renderPageCard(spec, anyBusy) {
 
 function drawJackFrame() {
   const f = $("#jackFrame");
-  if (!S.sheet && angle) angle = 0;
+  // A sheet made before the app cut it into views: cut it now (no OpenAI call).
+  if (S.sheet && !S.sheet.views && !fetchingViews) {
+    fetchingViews = true;
+    api("/api/sheet/views", { sheet: S.sheet.image })
+      .then((d) => { if (S.sheet) { S.sheet.views = d.views; commit(); } })
+      .catch(() => {}).finally(() => (fetchingViews = false));
+  }
+  const list = views();
+  if (angle >= list.length) angle = 0;
   f.innerHTML = "";
   if (!S.jack) f.innerHTML = '<div class="empty">Jack appears here.</div>';
-  else if (!angle) { const i = new Image(); i.src = S.jack.image; i.alt = "Jack, drawn from the photo"; f.append(i); }
   else {
-    // Show one cell of the 4 x 2 sheet, filling the page's height.
-    const [cell, label] = ANGLES[angle], col = cell % 4, row = Math.floor(cell / 4);
-    const x = ((col + 0.5) * 1.125 - 0.5) / 3.5;
-    const d = document.createElement("div"); d.className = "sheetcell";
-    d.setAttribute("role", "img"); d.setAttribute("aria-label", `Jack: ${label}`);
-    d.style.backgroundImage = `url("${S.sheet.image}")`;
-    d.style.backgroundPosition = `${(x * 100).toFixed(2)}% ${row * 100}%`;
-    f.append(d);
+    const i = new Image(); i.src = list[angle].image;
+    i.alt = angle ? `Jack: ${list[angle].label}` : "Jack, drawn from the photo";
+    if (angle) i.className = "view";
+    f.append(i);
   }
-  const show = !!(S.jack && S.sheet);
+  const show = !!S.jack && list.length > 1;
   ["#anglePrev", "#angleNext", "#angleCaption"].forEach((s) => ($(s).hidden = !show));
-  if (show) $("#angleCaption").textContent = `${ANGLES[angle][1]} (${angle + 1} of ${ANGLES.length})`;
+  if (show) $("#angleCaption").textContent = `${list[angle].label} (${angle + 1} of ${list.length})`;
 }
 
 function addLine(parent, cls, text) { const p = document.createElement("div"); p.className = cls; p.textContent = text; parent.append(p); }
