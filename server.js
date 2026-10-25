@@ -83,7 +83,7 @@ app.post("/api/page", route(async (req) => {
   if (spec.editOf) images.unshift(imageField(req.body.source, `page ${spec.editOf}`));
   const prompt = pagePrompt(spec);
   const image = await timed(`page ${spec.id}`, () => editImage({ images, prompt, mock: spec.id }));
-  return { image: dataUrl(image), prompt, look: await measureTextZone(image, spec.textZone), model: MODEL };
+  return { image: dataUrl(image), prompt, look: await measureTextZone(image, spec), model: MODEL };
 }));
 
 // Fix one thing on a page: same picture, one change (image 1 = page, image 2 = reference).
@@ -95,7 +95,7 @@ app.post("/api/page/edit", route(async (req) => {
   const prompt = pageEditPrompt(spec, instruction);
   const image = await timed(`page ${spec.id} edit`, () =>
     editImage({ images: [pageImage, reference], prompt, mock: spec.id }));
-  return { image: dataUrl(image), prompt, look: await measureTextZone(image, spec.textZone), model: MODEL };
+  return { image: dataUrl(image), prompt, look: await measureTextZone(image, spec), model: MODEL };
 }));
 
 // Build the PDF: the pages in order, then About Me.

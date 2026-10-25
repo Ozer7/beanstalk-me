@@ -80,10 +80,10 @@ ALSO IN THIS PICTURE (each looks the same on every page it appears on):
 - the old man — small, stooped and cheerful, with a long white beard, a battered pointed green hat, a patched brown cloak and a crooked walking stick
 - Milky-White, the cow — a gentle, bony white cow with a pale pink nose, soft brown eyes, short curved horns and a small brass bell on a rope collar
 
-SCENE: a dirt road through green fields on the way to market, with a small market town far away on the horizon. The old man stands at the side of the road holding out an open palm toward Jack. In the palm are exactly five shiny beans, each a different colour: red, gold, green, blue and purple. Milky-White stands just behind Jack, on a rope that Jack holds.
-JACK: in three-quarter view, turned toward the old man, so most of the face is still visible — both eyes showing. Jack holds Milky-White's rope in one hand and stares at the beans, curious and tempted. Same clothes as on page 1.
+SCENE: a dirt road through green fields on the way to market, with a small market town far away on the horizon. The old man stands at the side of the road holding out an open palm toward Jack. In the palm lie exactly FIVE shiny beans — not four, not six — spread out in one row so each can be counted: one red, one gold, one green, one blue, one purple. There are no other beans anywhere in the picture. Milky-White stands just behind Jack, on a rope that Jack holds.
+JACK: in three-quarter view, NOT facing the camera: Jack's body and head are turned about 45 degrees toward the old man, so we see more of one side of the face than the other, with both eyes still visible. Jack holds Milky-White's rope in one hand and looks down at the beans in the old man's palm, curious and tempted. Same clothes as on page 1.
 LIGHT AND COLOUR: bright, clear late-morning daylight. Fresh greens, warm earth tones and a soft blue sky.
-SPACE FOR THE WORDS: keep the top third of the picture quiet and simple — open sky, calm and pale blue with only a few faint wisps of cloud. Nothing reaches up into it: no birds, trees, rooftops, hills or heads. No people, faces, hands, important objects or busy detail there. The words of the page are printed over that area later.
+SPACE FOR THE WORDS: keep the top third of the picture quiet and simple — open sky, calm and pale blue with only a few faint wisps of cloud. Nothing reaches up into it: no birds, trees, rooftops, hills, heads, hats or horns. Frame the characters from a little further back so the tops of all their heads sit well below the top third. No people, faces, hands, important objects or busy detail there. The words of the page are printed over that area later.
 
 RULES: Jack appears exactly once. No text anywhere — no letters, numbers, signs, labels, captions or speech bubbles. One full-bleed picture, no border or frame.
 ```
@@ -105,8 +105,8 @@ ALSO IN THIS PICTURE (each looks the same on every page it appears on):
 - Jack's mother — a slim woman in her thirties with a kind, tired face; her skin tone and hair colour match Jack's; her hair is tucked under a faded blue headscarf; she wears a patched grey-blue dress and a cream apron
 - the cottage — a small, crooked stone cottage with a mossy thatched roof, a round blue wooden front door and two small square windows
 
-SCENE: outside the cottage at dusk. Jack's mother leans out of an open, lit window, flinging a handful of beans away. The five coloured beans scatter through the air and fall onto a bare patch of garden soil beside the cottage, with open sky above that patch. Jack stands in the open front doorway, watching.
-JACK: standing in the open front doorway, full figure and smaller in the frame, the face clearly visible and lit warmly from inside the cottage, watching the beans fly. Expression: dismayed.
+SCENE: outside the cottage at dusk. Jack's mother leans out of an open, lit window, flinging a handful of beans away. Exactly five beans — one red, one gold, one green, one blue, one purple — scatter through the air and fall onto a bare patch of garden soil beside the cottage, with open sky above that patch. Jack stands in the open front doorway, watching the beans.
+JACK: standing in the open front doorway, full figure and smaller in the frame. Jack does NOT look at the viewer: his head and eyes are turned toward the beans falling from the window, so we see his face in three-quarter view, lit warmly from inside the cottage. One hand is raised, mouth open. Expression: dismayed.
 LIGHT AND COLOUR: dusk: a deep blue-violet evening sky with the first stars; warm orange light glows from the cottage's door and window. A clearly darker, cooler palette than the daytime pages.
 SPACE FOR THE WORDS: keep the bottom third of the picture quiet and simple — dark, shadowy grass in the front garden, simple and low in contrast. No people, faces, hands, important objects or busy detail there. The words of the page are printed over that area later.
 

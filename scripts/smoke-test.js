@@ -32,12 +32,12 @@ const reference = await editImage({ images: [], prompt: referencePrompt(), mock:
 const pages = [];
 for (const spec of enabledPages()) {
   const image = await editImage({ images: [reference], prompt: pagePrompt(spec), mock: spec.id });
-  const look = await measureTextZone(image, spec.textZone);
+  const look = await measureTextZone(image, spec);
   pages.push({ spec, image });
   console.log(`✓ page ${spec.id}: words in the ${spec.textZone.edge} zone, ${look.ink} ink`);
 }
-assert.equal((await measureTextZone(pages[1].image, pages[1].spec.textZone)).ink, "dark", "page 2 sky -> dark words");
-assert.equal((await measureTextZone(pages[2].image, pages[2].spec.textZone)).ink, "light", "page 3 grass -> light words");
+assert.equal((await measureTextZone(pages[1].image, pages[1].spec)).ink, "dark", "page 2 sky -> dark words");
+assert.equal((await measureTextZone(pages[2].image, pages[2].spec)).ink, "light", "page 3 grass -> light words");
 
 // 3. The PDF: pages in order, then About Me.
 const child = { name: "Test Child", age: "6", likes: "drawing", food: "", growUp: "a vet", more: "Likes cows." };

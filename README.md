@@ -30,11 +30,11 @@ Every page card has **Fix one thing**: it sends the finished page plus the refer
 
 Every prompt asks for a quiet strip where the words will go (lower third on page 1, the sky on page 2, the dark grass on page 3) and forbids any lettering. The PDF layer (`lib/pdf.js`) then:
 
-- measures that strip and picks light or dark words, with a soft shadow band behind them, stronger when the background is busy;
+- measures the exact box where the words will print and picks light or dark words, with a soft shadow band behind them that gets stronger only when something sits under the words;
 - sets the story text in Fredoka, sized to fit and balanced across lines;
 - adds the About Me page with Jack's portrait, the name and the typed details.
 
-The page cards in the app preview the words the same way, and flag a page when its words strip looks busy.
+The page cards in the app preview the words the same way, and flag a page when a person or object sits under its words (the busiest cell of the words box has a lot of edges; a clean sky doesn't).
 
 ## Files
 
@@ -43,7 +43,8 @@ The page cards in the app preview the words the same way, and flag a page when i
 | `lib/storyboard.js` | Style string, Jack's outfit, the cast, and the page specs (words, scene, text zone). Pages 4–20 get added here. |
 | `lib/prompts.js` | Builds the prompt for each kind of call: Jack, fix Jack, page, fix page. |
 | `lib/images.js` | The one place that calls OpenAI (`images.edit`). Exactly one call per request, no retries. |
-| `lib/look.js` | Measures a page's words strip (brightness, how busy it is). |
+| `lib/layout.js` | Where the words go on each page: size, line breaks, the box they cover. Used by both the PDF and the check below. |
+| `lib/look.js` | Measures the picture under the words (brightness, whether something is in the way). |
 | `lib/pdf.js` | Builds the PDF. |
 | `server.js` | Express routes. |
 | `public/index.html` | The app. |
