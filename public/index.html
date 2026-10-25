@@ -435,6 +435,7 @@ const busy = { jack: false, sheet: false, pages: new Set(), book: false };
 // sheet by the server (lib/sheet.js).
 let angle = 0;
 let fetchingViews = false;
+const VIEWS_V = 2; // bump when the server's way of cutting the sheet changes
 const views = () => [{ label: "Jack", image: S.jack && S.jack.image }, ...((S.sheet && S.sheet.views) || [])];
 
 const store = (() => {
@@ -537,7 +538,7 @@ async function makeSheet() {
   angle = 0;
   await work("sheet", $("#jackFrame"), "Drawing Jack from other angles", "usually about 30 seconds", "#jackError", async () => {
     const d = await api("/api/sheet", { reference: S.jack.image, photo: S.photoNorm });
-    S.sheet = { image: d.image, views: d.views, jackVersion: S.jackVersion };
+    S.sheet = { image: d.image, views: d.views, viewsV: VIEWS_V, jackVersion: S.jackVersion };
   });
 }
 
@@ -807,10 +808,10 @@ function renderPageCard(spec, anyBusy) {
 function drawJackFrame() {
   const f = $("#jackFrame");
   // A sheet made before the app cut it into views: cut it now (no OpenAI call).
-  if (S.sheet && !S.sheet.views && !fetchingViews) {
+  if (S.sheet && S.sheet.viewsV !== VIEWS_V && !fetchingViews) {
     fetchingViews = true;
     api("/api/sheet/views", { sheet: S.sheet.image })
-      .then((d) => { if (S.sheet) { S.sheet.views = d.views; commit(); } })
+      .then((d) => { if (S.sheet) { S.sheet.views = d.views; S.sheet.viewsV = VIEWS_V; commit(); } })
       .catch(() => {}).finally(() => (fetchingViews = false));
   }
   const list = views();
