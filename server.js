@@ -13,6 +13,7 @@ import {
 import { measureTextZone } from "./lib/look.js";
 import { checkPage, CHECK_MODEL } from "./lib/check.js";
 import { buildBookPdf, unsupportedChars } from "./lib/pdf.js";
+import { layoutWords, PAGE_W } from "./lib/layout.js";
 
 // The API key comes ONLY from the environment (Render → Environment).
 const PORT = process.env.PORT || 3000;
@@ -49,8 +50,16 @@ app.get("/api/storyboard", (_req, res) => {
     quality: PAGE_QUALITY,
     checkModel: CHECK_MODEL,
     mock: MOCK,
-    pages: PAGES.map(({ id, title, text, enabled, textZone, textSpace, editOf }) => ({
-      id, title, text, enabled, textZone, textSpace, editOf: editOf ?? null,
+    pages: PAGES.map((p) => ({
+      id: p.id,
+      title: p.title,
+      text: p.text,
+      enabled: p.enabled,
+      textZone: p.textZone,
+      textSpace: p.textSpace,
+      editOf: p.editOf ?? null,
+      // Exactly how the PDF sets the words, so the app's preview matches it.
+      words: p.text ? wordsPreview(p) : null,
     })),
   });
 });
@@ -155,6 +164,11 @@ app.listen(PORT, () =>
 // ---------------------------------------------------------------------------
 // helpers
 // ---------------------------------------------------------------------------
+function wordsPreview(spec) {
+  const { size, lines, box } = layoutWords(spec);
+  return { size: size / PAGE_W, lines: lines.map((l) => l.text), box };
+}
+
 function references(body) {
   const refs = [imageField(body.reference, "reference")];
   if (body.sheet) refs.push(imageField(body.sheet, "character sheet"));

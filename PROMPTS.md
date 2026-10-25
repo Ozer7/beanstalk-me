@@ -2,7 +2,7 @@
 
 The exact prompts the app sends, generated from `lib/storyboard.js` and `lib/prompts.js` (`npm run prompts`). Paste them into the OpenAI Playground (Images) to test by hand before changing the code.
 
-**Settings the app uses:** model `gpt-image-2.5-flare`, size `1024x1536`, quality `high` for Jack and `medium` for pages, JPEG output.
+**Settings the app uses:** model `gpt-image-2.5-sunburst`, size `1024x1536`, quality `high` for Jack and `high` for pages, JPEG output.
 
 **The style line, word for word in every call:**
 
